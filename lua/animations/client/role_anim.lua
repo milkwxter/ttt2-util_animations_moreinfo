@@ -1,10 +1,14 @@
 local surface = surface
 local draw = draw
 
--- Fonts
+-- fonts
 surface.CreateFont("ReceivedRole", {font = "Trebuchet24", size = 52, weight = 1000})
+surface.CreateFont("RoleTeam", {font = "Trebuchet18", size = 24, weight = 500})
 
 local receivedRole
+local receivedTeam
+local roleIcon
+
 local duration = 3
 local animColor = Color(0, 0, 0, 120)
 local animStart = 0
@@ -27,12 +31,17 @@ hook.Add("TTT2UpdateSubrole", "TTT2RoleAnim", function(ply, old, new)
 	local tmp = LANG.GetTranslation(rd.name)
 
 	receivedRole = tmp
+	receivedTeam = LANG.GetTranslation(ply:GetRealTeam())
+	roleIcon = rd.iconMaterial
+	
 	animColor = rd.color
 	animStart = CurTime()
 end)
 
 hook.Add("TTTEndRound", "TTT2ResetRoleAnimData", function()
 	receivedRole = nil
+	receivedTeam = nil
+	roleIcon = nil
 end)
 
 hook.Add("HUDPaint", "TTT2PaintRoleAnim", function()
@@ -71,10 +80,25 @@ hook.Add("HUDPaint", "TTT2PaintRoleAnim", function()
 		ThickLine(ex, y2, ex - _tmp, y2, thickness, false)
 
 		-- Draw current class state
-		ShadowedText(receivedRole, "ReceivedRole", center.x, yt - 32, Color(255, 255, 255, a), TEXT_ALIGN_CENTER)
+		local roleY = yt - 40
+		local teamY = yt + 20
+		surface.SetFont("ReceivedRole")
+		local textWidth, textHeight = surface.GetTextSize(text)
+		ShadowedText(receivedRole, "ReceivedRole", center.x, roleY, Color(255, 255, 255, a), TEXT_ALIGN_CENTER)
+		ShadowedText(receivedTeam, "RoleTeam", center.x, teamY, Color(255, 255, 255, a), TEXT_ALIGN_CENTER)
+		
+		-- draw icon
+		local iconSize = 64
+		local iconX = center.x - (iconSize / 2)
+		local iconY = yt - (iconSize / 2)
+		surface.SetMaterial(roleIcon)
+		surface.DrawTexturedRect(iconX - textWidth - 64, iconY, iconSize, iconSize)
+		surface.DrawTexturedRect(iconX + textWidth + 64, iconY, iconSize, iconSize)
 
 		if animStart + duration <= CurTime() then
 			receivedRole = nil
+			receivedTeam = nil
+			roleIcon = nil
 		end
 	end
 end)
