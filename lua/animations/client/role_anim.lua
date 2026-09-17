@@ -3,7 +3,7 @@ local draw = draw
 
 -- fonts
 surface.CreateFont("ReceivedRole", {font = "Trebuchet24", size = 52, weight = 1000})
-surface.CreateFont("RoleTeam", {font = "Trebuchet18", size = 24, weight = 500})
+surface.CreateFont("RoleTeam", {font = "Trebuchet18", size = 24, weight = 500, italic = true})
 
 local receivedRole
 local receivedTeam
@@ -80,20 +80,20 @@ hook.Add("HUDPaint", "TTT2PaintRoleAnim", function()
 		ThickLine(ex, y2, ex - _tmp, y2, thickness, false)
 
 		-- Draw current class state
-		local roleY = yt - 40
-		local teamY = yt + 20
+		local roleY = yt - 20
+		local teamY = yt + 25
 		surface.SetFont("ReceivedRole")
-		local textWidth, textHeight = surface.GetTextSize(text)
-		ShadowedText(receivedRole, "ReceivedRole", center.x, roleY, Color(255, 255, 255, a), TEXT_ALIGN_CENTER)
-		ShadowedText(receivedTeam, "RoleTeam", center.x, teamY, Color(255, 255, 255, a), TEXT_ALIGN_CENTER)
+		local textWidth, textHeight = surface.GetTextSize("ReceivedRole")
+		ShadowedText(receivedRole, "ReceivedRole", center.x, roleY, Color(255, 255, 255, a), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+		ShadowedText(receivedTeam, "RoleTeam", center.x, teamY, Color(255, 255, 255, a), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 		
 		-- draw icon
 		local iconSize = 64
-		local iconX = center.x - (iconSize / 2)
 		local iconY = yt - (iconSize / 2)
+		local gap = 16
 		surface.SetMaterial(roleIcon)
-		surface.DrawTexturedRect(iconX - textWidth - 64, iconY, iconSize, iconSize)
-		surface.DrawTexturedRect(iconX + textWidth + 64, iconY, iconSize, iconSize)
+		surface.DrawTexturedRect(center.x - (textWidth / 2) - gap - iconSize, iconY, iconSize, iconSize)
+		surface.DrawTexturedRect(center.x + (textWidth / 2) + gap, iconY, iconSize, iconSize)
 
 		if animStart + duration <= CurTime() then
 			receivedRole = nil
