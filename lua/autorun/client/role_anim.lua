@@ -14,6 +14,14 @@ local animStart = 0
 -- colors
 local textColor = Color(255, 255, 255, 255)
 
+-- role overrides
+local roleOverrides = {
+	bodyguard = {
+		subtitle = "ttt2_role_anim_bodyguard_subtitle",
+	},
+}
+
+-- draw helpers
 local function ShadowedText(text, font, x, y, color, xalign, yalign)
 	draw.SimpleText(text, font, x + 2, y + 2, COLOR_BLACK, xalign, yalign)
 	draw.SimpleText(text, font, x, y, color, xalign, yalign)
@@ -25,6 +33,7 @@ local function ThickLine(sx, sy, ex, ey, thickness, dir)
 	end
 end
 
+-- real hook
 hook.Add("TTT2UpdateSubrole", "TTT2RoleAnim", function(ply, old, new)
 	if ply ~= LocalPlayer() then return end
 	
@@ -32,16 +41,21 @@ hook.Add("TTT2UpdateSubrole", "TTT2RoleAnim", function(ply, old, new)
 	if not GetConVar("ttt2_role_anim_enabled"):GetBool() then return end
 
 	local rd = ply:GetSubRoleData()
+	local override = roleOverrides[rd.name]
 	
 	local data = {
 		role = LANG.GetTranslation(rd.name),
-		team = LANG.GetTranslation(ply:GetRealTeam()),
+		team = LANG.GetTranslation((override and override.subtitle) or ply:GetRealTeam()),
 		icon = rd.iconMaterial,
 		color = rd.color,
 	}
 	
+	-- calc length of strings respective to the fonts
 	surface.SetFont("ReceivedRole")
-	data.textWidth = surface.GetTextSize(data.role)
+	local roleWidth = surface.GetTextSize(data.role)
+	surface.SetFont("RoleTeam")
+	local teamWidth = surface.GetTextSize(data.team)
+	data.textWidth = math.max(roleWidth, teamWidth)
 	
 	anim = data
 	animStart = CurTime()
